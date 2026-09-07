@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Math Practice</title>
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0b0c10;
+      --card-bg: rgba(22, 24, 35, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f5f5f7;
+      --text-secondary: #86868b;
+      --accent-blue: #2997ff;
+      --accent-blue-hover: #0077ed;
+      --system-green: #30d158;
+      --system-red: #ff453a;
+      --system-orange: #ff9f0a;
+      --shadow-light: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.6);
+      --radius-large: 22px;
+      --radius-medium: 14px;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      margin: 0;
+      padding: 0;
+      line-height: 1.47059;
+      letter-spacing: -0.022em;
+      -webkit-tap-highlight-color: transparent;
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(41, 151, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(48, 209, 88, 0.05) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+
+    /* Apple Glassmorphism Header */
+    nav {
+      background: rgba(11, 12, 16, 0.75);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, #86868b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat-badge {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-sound {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sound:active {
+      transform: scale(0.92);
+    }
+
+    .level-banner {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-blue);
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 0.5rem 1.25rem 1.5rem 1.25rem;
+    }
+
+    .hero h1 {
+      font-size: 2.3rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 6px 0;
+      color: var(--text-primary);
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      margin: 0 auto;
+    }
+
+    .progress-bar-container {
+      max-width: 420px;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1.2rem auto 0 auto;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--system-green));
+      transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 0 12px rgba(41, 151, 255, 0.4);
+    }
+
+    .main-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0.5rem 1.25rem 4rem 1.25rem;
+    }
+
+    /* Floating Apple High-End Cards */
+    .problem-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: var(--radius-large);
+      padding: 26px;
+      margin-bottom: 24px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-light);
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .problem-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .q-count {
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .topic-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: rgba(41, 151, 255, 0.12);
+      color: var(--accent-blue);
+      border: 1px solid rgba(41, 151, 255, 0.2);
+    }
+
+    .problem-text {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      height: 50px;
+      padding: 12px 18px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-medium);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 400;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 4px rgba(41, 151, 255, 0.2);
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-check {
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      height: 50px;
+      flex: 2;
+      border: none;
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(41, 151, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-check:hover {
+      background: var(--accent-blue-hover);
+      box-shadow: 0 6px 20px rgba(41, 151, 255, 0.4);
+    }
+
+    .btn-check:active {
+      transform: scale(0.97);
+    }
+
+    .btn-hint {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.9rem;
+      height: 50px;
+      flex: 1;
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-hint:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-hint:active {
+      transform: scale(0.97);
+    }
+
+    .hint-box {
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: var(--radius-medium);
+      background: rgba(255, 159, 10, 0.12);
+      border: 1px solid rgba(255, 159, 10, 0.25);
+      color: #ffd699;
+      font-size: 0.9rem;
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: var(--radius-medium);
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback.correct {
+      background: rgba(48, 209, 88, 0.15);
+      color: #63e281;
+      border: 1px solid rgba(48, 209, 88, 0.25);
+    }
+
+    .feedback.incorrect {
+      background: rgba(255, 69, 58, 0.15);
+      color: #ff7b72;
+      border: 1px solid rgba(255, 69, 58, 0.25);
+    }
+
+    .btn-next-batch {
+      background: var(--system-green);
+      color: #000000;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1.05rem;
+      height: 56px;
+      width: 100%;
+      border: none;
+      border-radius: var(--radius-medium);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(48, 209, 88, 0.3);
+      margin-top: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-next-batch:active {
+      transform: scale(0.97);
+    }
+
+    @media (min-width: 600px) {
+      .input-group { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">Math Practice</div>
+    <div class="stats-container">
+      <button class="btn-sound" id="mute-btn" onclick="toggleSound()">🔊 Sound</button>
+      <div class="stat-badge">🔥 <span id="streak-counter">0</span></div>
+      <div class="stat-badge">⚡ <span id="score-tracker">0</span> pts</div>
+    </div>
+  </nav>
+
+  <div class="level-banner" id="rank-display">Level 1 — Starter</div>
+
+  <div class="hero">
+    <h1>6th Grade Mastery</h1>
+    <p>Solve 20 exercises to advance to the next set.</p>
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="main-container">
+    <div id="questions-wrapper"></div>
+
+    <button id="next-btn" class="btn-next-batch" onclick="loadNextBatch()">
+      Continue to Next Set
+    </button>
+  </div>
+
+<script>
+let soundMuted = false;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function toggleSound() {
+  soundMuted = !soundMuted;
+  document.getElementById('mute-btn').innerText = soundMuted ? "🔇 Muted" : "🔊 Sound";
+}
+
+function playSound(type) {
+  if (soundMuted) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  if (type === 'correct') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  } else if (type === 'wrong') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(261.63, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(220.00, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  } else if (type === 'hint') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.18);
+  }
+}
+
+function triggerConfetti() {
+  if (typeof confetti === 'function') {
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#2997ff', '#30d158', '#ff9f0a']
+    });
+  }
+}
+
+function getRank(xp) {
+  if (xp >= 5000) return "Level 5 — Scholar";
+  if (xp >= 2500) return "Level 4 — Advanced";
+  if (xp >= 1000) return "Level 3 — Intermediate";
+  if (xp >= 300)  return "Level 2 — Practitioner";
+  return "Level 1 — Starter";
+}
+
+const questionPool = [
+  {q: "Evaluate: 4² + 3 × 5", a: "31", tag: "pemdas", label: "Operations", hint: "Evaluate exponent (4² = 16), multiply (3 × 5 = 15), then add."},
+  {q: "Evaluate: 20 − (3 + 5) ÷ 2", a: "16", tag: "pemdas", label: "Operations", hint: "Calculate parentheses first (3 + 5 = 8), divide by 2, then subtract from 20."},
+  {q: "Evaluate: 3³ + 10 ÷ 2", a: "32", tag: "pemdas", label: "Operations", hint: "Evaluate exponent (3³ = 27), divide (10 ÷ 2 = 5), then add."},
+  {q: "Evaluate: (8 − 3)² + 6", a: "31", tag: "pemdas", label: "Operations", hint: "Subtract inside parentheses (8 − 3 = 5), square it (5² = 25), then add 6."},
+  {q: "Evaluate: 100 − 5 × (2 + 4)²", a: "-80", tag: "pemdas", label: "Operations", hint: "Add in parentheses (6), square (36), multiply by 5 (180), then subtract from 100."},
+
+  {q: "Solve for x: x + 15 = 42", a: "27", tag: "algebra", label: "Algebra", hint: "Subtract 15 from both sides."},
+  {q: "Solve for y: 5y = 45", a: "9", tag: "algebra", label: "Algebra", hint: "Divide both sides by 5."},
+  {q: "Solve for a: a − 12 = 19", a: "31", tag: "algebra", label: "Algebra", hint: "Add 12 to both sides."},
+  {q: "Solve for m: m ÷ 6 = 7", a: "42", tag: "algebra", label: "Algebra", hint: "Multiply both sides by 6."},
+  {q: "Solve for x: 3x + 5 = 26", a: "7", tag: "algebra", label: "Algebra", hint: "Subtract 5 (3x = 21), then divide by 3."},
+
+  {q: "Simplified ratio of 12 boys to 16 girls?", a: "3:4", tag: "percent", label: "Ratios & %", hint: "Divide both values by 4."},
+  {q: "Unit rate: If 4 tickets cost $20, what is 1 ticket?", a: "5", tag: "percent", label: "Ratios & %", hint: "Divide total cost ($20) by quantity (4)."},
+  {q: "Find 25% of 80.", a: "20", tag: "percent", label: "Ratios & %", hint: "25% equals 1/4. Divide 80 by 4."},
+  {q: "Find 10% of 250.", a: "25", tag: "percent", label: "Ratios & %", hint: "Move the decimal point one place to the left."},
+  {q: "A $100 coat is 30% off. How much is saved?", a: "30", tag: "percent", label: "Ratios & %", hint: "Multiply $100 by 0.30."},
+
+  {q: "Theoretical probability of rolling an even number on a die?", a: "1/2", tag: "prob", label: "Statistics", hint: "Even outcomes are 2, 4, 6 (3 out of 6)."},
+  {q: "Bag has 4 red, 3 green, 3 yellow. Probability of red?", a: "2/5", tag: "prob", label: "Statistics", hint: "4 red marbles out of 10 total marbles = 4/10 = 2/5."},
+  {q: "Find the mean of: 4, 8, 12, 16", a: "10", tag: "prob", label: "Statistics", hint: "Sum the values (40) and divide by the count (4)."},
+  {q: "Find the median of: 3, 7, 9, 15, 21", a: "9", tag: "prob", label: "Statistics", hint: "Locate the middle value in the ordered list."},
+  {q: "Find the mode of: 85, 90, 85, 70, 95, 85", a: "85", tag: "prob", label: "Statistics", hint: "Identify the number that appears most frequently."},
+
+  {q: "Area of rectangle: length = 12 cm, width = 7 cm?", a: "84", tag: "geom", label: "Geometry", hint: "Formula: Area = length × width."},
+  {q: "Perimeter of square with side length = 9 inches?", a: "36", tag: "geom", label: "Geometry", hint: "Formula: Perimeter = 4 × side length."},
+  {q: "Volume of box: length = 6 in, width = 4 in, height = 5 in?", a: "120", tag: "geom", label: "Geometry", hint: "Formula: Volume = length × width × height."},
+  {q: "Area of triangle: base = 10 cm, height = 6 cm?", a: "30", tag: "geom", label: "Geometry", hint: "Formula: Area = ½ × base × height."},
+  {q: "Total surface area of a cube with side = 3 cm?", a: "54", tag: "geom", label: "Geometry", hint: "One face area = 3 × 3 = 9. Multiply by 6 total faces."}
+];
+
+let currentBatch = [];
+let batchSolvedCount = 0;
+let totalXP = 0;
+let currentStreak = 0;
+
+function shuffleArray(array) {
+  let arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderBatch() {
+  batchSolvedCount = 0;
+  document.getElementById('next-btn').style.display = "none";
+  document.getElementById('progress-bar').style.width = "0%";
+  
+  currentBatch = shuffleArray(questionPool).slice(0, 20);
+
+  let wrapper = document.getElementById('questions-wrapper');
+  wrapper.innerHTML = "";
+
+  currentBatch.forEach((item, idx) => {
+    let qNum = idx + 1;
+    let cardHTML = `
+      <div class="problem-card" id="card-${qNum}">
+        <div class="card-meta">
+          <span class="topic-tag">${item.label}</span>
+          <span class="q-count">${qNum} of 20</span>
+        </div>
+        <div class="problem-text">${item.q}</div>
+        <div class="input-group">
+          <input type="text" id="input-${qNum}" placeholder="Your answer">
+          <div class="btn-row">
+            <button class="btn-check" id="btn-${qNum}" onclick="checkAnswer(${qNum})">Submit</button>
+            <button class="btn-hint" onclick="toggleHint(${qNum})">Hint</button>
+          </div>
+        </div>
+        <div id="hint-${qNum}" class="hint-box">${item.hint}</div>
+        <div id="fb-${qNum}" class="feedback"></div>
+      </div>
+    `;
+    wrapper.innerHTML += cardHTML;
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleHint(qNum) {
+  playSound('hint');
+  let hintBox = document.getElementById('hint-' + qNum);
+  hintBox.style.display = hintBox.style.display === "block" ? "none" : "block";
+}
+
+function checkAnswer(qNum) {
+  let userInput = document.getElementById('input-' + qNum).value.trim().toLowerCase()
+    .replace("x=", "").replace("x =", "")
+    .replace("y=", "").replace("y =", "")
+    .replace("cm2", "").replace("cm^2", "")
+    .replace("cubic inches", "").replace("mph", "")
+    .replace("$", "").trim();
+
+  let fb = document.getElementById('fb-' + qNum);
+  let expected = currentBatch[qNum - 1].a.toLowerCase();
+
+  let isCorrect = (userInput === expected) || 
+                  (expected === "1/2" && (userInput === "50%" || userInput === "0.5")) ||
+                  (expected === "60%" && (userInput === "60" || userInput === "3/5")) ||
+                  (expected === "3/4" && userInput === "3:4") ||
+                  (expected === "3:4" && userInput === "3/4");
+
+  if (isCorrect) {
+    if (!fb.classList.contains("correct")) {
+      batchSolvedCount++;
+      totalXP += 100 + (currentStreak * 10);
+      currentStreak++;
+    }
+    playSound('correct');
+    triggerConfetti();
+    fb.className = "feedback correct";
+    fb.innerHTML = `Correct! +${100 + (currentStreak * 10)} pts`;
+    
+    document.getElementById('input-' + qNum).disabled = true;
+    document.getElementById('btn-' + qNum).disabled = true;
+    document.getElementById('btn-' + qNum).style.opacity = "0.5";
+  } else {
+    playSound('wrong');
+    currentStreak = 0;
+    fb.className = "feedback incorrect";
+    fb.innerHTML = "Incorrect. Try again.";
+  }
+  fb.style.display = "block";
+
+  document.getElementById('score-tracker').innerText = totalXP;
+  document.getElementById('streak-counter').innerText = currentStreak;
+  document.getElementById('rank-display').innerText = getRank(totalXP);
+  
+  let progressPercent = (batchSolvedCount / 20) * 100;
+  document.getElementById('progress-bar').style.width = progressPercent + "%";
+
+  if (batchSolvedCount === 20) {
+    triggerConfetti();
+    let nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = "flex";
+    nextBtn.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function loadNextBatch() {
+  renderBatch();
+}
+
+renderBatch();
+</script>
+
+</body>
+</html>
